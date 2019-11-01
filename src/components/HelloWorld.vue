@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <!--<img v-bind:src='picture' alt="user_pic">-->
+    <h1>Number of Generated Users: {{length}}</h1>
     <table class="table">
       <thead>
           <tr>
@@ -23,15 +24,16 @@ export default {
   data () {
     return {
       items: [],
-      length: '10',
-      columns: ['Title', 'First_Name', 'Last_Name', 'User_Name', 'Photo']
+      length: '7',
+      columns: ['ID', 'Title', 'First_Name', 'Last_Name', 'User_Name', 'Photo']
     }
   },
   mounted () {
     axios.get('https://randomuser.me/api/?results=' + this.length)
     .then(response => (
-      this.items = response.data.results.map(function (item) {
+      this.items = response.data.results.map(function (item, index) {
         let temp = {
+          ID: index + 1,
           Title: item.name.title,
           First_Name: item.name.first,
           Last_Name: item.name.last,
