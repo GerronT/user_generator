@@ -1,10 +1,18 @@
 <template>
   <div class="hello">
-    <img v-bind:src='picture' alt="user_pic">
-    <h1>Title: {{title}}</h1>
-    <h1>First Name: {{firstName}}</h1>
-    <h1>Last Name: {{lastName}}</h1>
-    <h1>Username: {{userName}}</h1>
+    <!--<img v-bind:src='picture' alt="user_pic">-->
+    <table class="table">
+      <thead>
+          <tr>
+              <th v-for="(column, index) in columns" :key="index"> {{column}}</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr v-for="(item, index) in items" :key="index">
+            <td v-for="(column, indexColumn) in columns" :key="indexColumn">{{item[column]}}</td>
+          </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -14,21 +22,26 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      title: '',
-      firstName: '',
-      lastName: '',
-      userName: '',
-      picture: ''
+      items: [],
+      length: '10',
+      columns: ['Title', 'First_Name', 'Last_Name', 'User_Name', 'Photo']
     }
   },
   mounted () {
-    axios.get('https://randomuser.me/api/')
-    .then(response => (this.title = response.data.results[0].name.title,
-    this.firstName = response.data.results[0].name.first,
-    this.lastName = response.data.results[0].name.last,
-    this.userName = response.data.results[0].login.username,
-    this.picture = response.data.results[0].picture.large))
-  }
+    axios.get('https://randomuser.me/api/?results=' + this.length)
+    .then(response => (
+      this.items = response.data.results.map(function (item) {
+        let temp = {
+          Title: item.name.title,
+          First_Name: item.name.first,
+          Last_Name: item.name.last,
+          User_Name: item.login.username,
+          Photo: item.picture.thumbnail
+        };
+        return temp;
+      })
+      ))
+  },
 }
 </script>
 
@@ -47,5 +60,21 @@ li {
 }
 a {
   color: #42b983;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }
 </style>
