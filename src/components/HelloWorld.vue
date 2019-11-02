@@ -1,15 +1,15 @@
 <template>
   <div class="hello">
-    <input type="text" placeholder="Enter number of users (max: 5000)">
-    <input type="submit" value="Generate">
+    <input id="inputNum" type="text" placeholder="Enter number of users (max: 5000)" v-model="inputLength">
+    <input type="submit" value="Generate" v-on:click="generate">
 
     <h1>Number of Generated Users: {{length}}</h1>
 
     <p class='label'>Sort:</p>
-    <select id="sort" name="sort">
-      <option value="" disabled selected>----- Select -----</option>
-      <option value="alphabetical-username-az">By Username (A-Z)</option>
-      <option value="alphabetical-username-za">By Username (Z-A)</option>
+    <select id="sort" name="sort" @change="sortList($event.target.value)" v-model="sort">
+      <option value="" disabled selected>--- Select ---</option>
+      <option value="alphabetical-username-az">by username (A-Z)</option>
+      <option value="alphabetical-username-za">by username (Z-A)</option>
     </select>
 
     <table class="table">
@@ -39,25 +39,46 @@ export default {
   data () {
     return {
       items: [],
-      length: 10,
+      length: null,
+      inputLength: null,
+      sort: 'default',
       columns: ['#', 'Title', 'First Name', 'Last Name', 'Username', 'Photo']
     }
   },
-  mounted () {
-    if (this.length > 0) {
-      axios.get('https://randomuser.me/api/?results=' + this.length).then(response => (
-        this.items = response.data.results.map(function (item, index) {
-          let temp = {
-            ID: index + 1,
-            title: item.name.title,
-            firstName: item.name.first,
-            lastName: item.name.last,
-            userName: item.login.username,
-            photo: item.picture.large
-          };
-          return temp;
-        })
-      ))
+  methods: {
+    // generates a number of users based on user input
+    generate: function() {
+      if (this.inputLength > 0 && this.inputLength <= 5000) {
+        this.length = this.inputLength;
+        axios.get('https://randomuser.me/api/?results=' + this.length).then(response => (
+          this.items = response.data.results.map(function (item, index) {
+            let temp = {
+              id: index + 1,
+              title: item.name.title,
+              firstName: item.name.first,
+              lastName: item.name.last,
+              userName: item.login.username,
+              photo: item.picture.large
+            };
+            return temp;
+          })
+        ))
+      } else {
+        alert("Please enter a number between 1 to 5000");
+      }
+    },
+    // sorts the list of extracted users based on user selection
+    sortList: function(value) {
+      this.items.sort(function(a, b) {
+        a = JSON.stringify(a.userName);
+        b = JSON.stringify(b.userName);
+
+        if (value === 'alphabetical-username-az') {
+          return (a < b) ? -1 : (a > b) ? 1 : 0;
+        } else if (value === 'alphabetical-username-za') {
+          return (a > b) ? -1 : (a < b) ? 1 : 0;
+        }
+      })
     }
   }
 }
