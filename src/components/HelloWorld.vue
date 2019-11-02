@@ -6,7 +6,7 @@
     <h1>Number of Generated Users: {{length}}</h1>
 
     <p class='label'>Sort:</p>
-    <select id="sort" name="sort" @change="sortList($event.target.value)" v-model="sort">
+    <select id="sort" name="sort" @change="sortList($event)" v-model="sort">
       <option value="" disabled selected>--- Select ---</option>
       <option value="alphabetical-username-az">by username (A-Z)</option>
       <option value="alphabetical-username-za">by username (Z-A)</option>
@@ -20,7 +20,7 @@
       </thead>
       <tbody>
         <tr v-for="(item, index) in items" :key="index">
-          <td>{{index + 1}}</td>
+          <td>{{ item.id }}</td>
             <td>{{ item.title }}</td>
             <td>{{ item.firstName }}</td>
             <td>{{ item.lastName }}</td>
@@ -68,14 +68,14 @@ export default {
       }
     },
     // sorts the list of extracted users based on user selection
-    sortList: function(value) {
+    sortList: function(event) {
       this.items.sort(function(a, b) {
         a = JSON.stringify(a.userName);
         b = JSON.stringify(b.userName);
 
-        if (value === 'alphabetical-username-az') {
+        if (event.target.value === 'alphabetical-username-az') {
           return (a < b) ? -1 : (a > b) ? 1 : 0;
-        } else if (value === 'alphabetical-username-za') {
+        } else if (event.target.value === 'alphabetical-username-za') {
           return (a > b) ? -1 : (a < b) ? 1 : 0;
         }
       })
