@@ -3,17 +3,22 @@
     <!--<img v-bind:src='picture' alt="user_pic">-->
     <h1>Number of Generated Users: {{length}}</h1>
     <table class="table">
-      <thead>
-          <tr>
-              <th v-for="(column, index) in columns" :key="index"> {{column}}</th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr v-for="(item, index) in items" :key="index">
-            <td v-for="(column, indexColumn) in columns" :key="indexColumn">{{item[column]}}</td>
-          </tr>
-      </tbody>
-    </table>
+            <thead>
+                <tr>
+                    <th v-for="(column, index) in columns" :key="index"> {{column}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in items" :key="index">
+                    <td>{{index + 1}}</td>
+                    <td>{{ item.Title }}</td>
+                    <td>{{ item.First_Name }}</td>
+                    <td>{{ item.Last_Name }}</td>
+                    <td>{{ item.User_Name }}</td>
+                    <td><img v-bind:src='item.Photo' alt="user_pic"></td>
+                </tr>
+            </tbody>
+        </table>
   </div>
 </template>
 
@@ -38,12 +43,12 @@ export default {
           First_Name: item.name.first,
           Last_Name: item.name.last,
           User_Name: item.login.username,
-          Photo: item.picture.thumbnail
+          Photo: item.picture.large
         };
         return temp;
       })
       ))
-  },
+  }
 }
 </script>
 
