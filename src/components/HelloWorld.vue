@@ -1,9 +1,20 @@
 <template>
   <div class="hello">
-    <input id="inputNum" type="text" placeholder="Enter number of users (max: 5000)" v-model="inputLength">
-    <input type="submit" value="Generate" v-on:click="generate">
+    <div class="tab">
+      <button class="tablinks" v-on:click="switchTabs(event, 'external-API')">randomuser.me</button>
+      <button class="tablinks" v-on:click="switchTabs(event, 'internal-API')">use internal API</button>
+    </div>
 
-    <h1>Number of Generated Users: {{length}}</h1>
+    <div id="external-API" class="tabcontent">
+      <input id="inputNum" type="text" placeholder="Enter number of users (max: 5000)" v-model="inputLength">
+      <input type="submit" value="Generate" v-on:click="generate">
+
+      <h1>Number of Generated Users: {{length}}</h1>
+    </div>
+
+    <div id="internal-API" class="tabcontent">
+      <input type="submit" value="Generate" v-on:click="generateOwn">
+    </div>
 
     <p class='label'>Sort:</p>
     <select id="sort" name="sort" @change="sortList($event)" v-model="sort">
@@ -21,14 +32,15 @@
       <tbody>
         <tr v-for="(item, index) in items" :key="index">
           <td>{{ item.id }}</td>
-            <td>{{ item.title }}</td>
-            <td>{{ item.firstName }}</td>
-            <td>{{ item.lastName }}</td>
-            <td>{{ item.userName }}</td>
-            <td><img v-bind:src='item.photo' alt="user_pic"></td>
+          <td>{{ item.title }}</td>
+          <td>{{ item.firstName }}</td>
+          <td>{{ item.lastName }}</td>
+          <td>{{ item.userName }}</td>
+          <td><img v-bind:src='item.photo' alt="user_pic"></td>
         </tr>
       </tbody>
     </table>
+
   </div>
 </template>
 
@@ -62,10 +74,39 @@ export default {
             };
             return temp;
           })
-        ))
+        )).catch(function(error) {
+            if (error.response) {
+              alert(error.response.data);
+              alert(error.response.status);
+            } else {
+              alert(error);
+            }
+        })
       } else {
         alert("Please enter a number between 1 to 5000");
       }
+    },
+    generateOwn: function() {
+        axios.get('http://127.0.0.1:8000/users').then(response => (
+          this.items = response.data.results.map(function (item, index) {
+            let temp = {
+              id: index + 1,
+              title: item.title,
+              firstName: item.firstName,
+              lastName: item.lastName,
+              userName: item.userName,
+              photo: item.photo
+            };
+            return temp;
+          })
+        )).catch(function(error) {
+            if (error.response) {
+              alert(error.response.data);
+              alert(error.response.status);
+            } else {
+              alert(error);
+            }
+        })
     },
     // sorts the list of extracted users based on user selection
     sortList: function(event) {
@@ -79,6 +120,27 @@ export default {
           return (a > b) ? -1 : (a < b) ? 1 : 0;
         }
       })
+    },
+    // Switches between internal API and external API (https://www.w3schools.com/howto/howto_js_tabs.asp)
+    switchTabs: function(evt, cityName) {
+      // Declare all variables
+      var i, tabcontent, tablinks;
+
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      // Show the current tab, and add an "active" class to the button that opened the tab
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
     }
   }
 }
@@ -161,7 +223,66 @@ export default {
     margin-left: 10px;
   }
 
+  input[class=create] {
+    width: 10%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 50px;
+  }
+
   input[type=submit]:hover {
     background-color: #45a049;
   }
+
+  /* Style the tab https://www.w3schools.com/howto/howto_js_tabs.asp*/
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.tabcontent {
+  animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
 </style>
