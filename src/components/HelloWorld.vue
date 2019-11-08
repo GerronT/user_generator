@@ -1,19 +1,22 @@
 <template>
   <div class="hello">
     <div class="tab">
-      <button class="tablinks" v-on:click="switchTabs(event, 'external-API')">randomuser.me</button>
-      <button class="tablinks" v-on:click="switchTabs(event, 'internal-API')">use internal API</button>
+      <button class="tablinks" v-on:click="switchTabs($event, 'external-API')">randomuser.me</button>
+      <button class="tablinks" v-on:click="switchTabs($event, 'internal-API')">use internal API</button>
     </div>
 
     <div id="external-API" class="tabcontent">
       <input id="inputNum" type="text" placeholder="Enter number of users (max: 5000)" v-model="inputLength">
-      <input type="submit" value="Generate" v-on:click="generate">
+      <input type="submit" value="Generate" v-on:click="useExternal">
 
       <h1>Number of Generated Users: {{length}}</h1>
     </div>
 
     <div id="internal-API" class="tabcontent">
-      <input type="submit" value="Generate" v-on:click="generateOwn">
+      <input id="inputNumI" type="text" placeholder="Enter number of users (max: 100)" v-model="inputLengthI">
+      <input type="submit" value="Generate" v-on:click="useInternal">
+
+      <h1>Number of Generated Users: {{lengthI}}</h1>
     </div>
 
     <p class='label'>Sort:</p>
@@ -53,13 +56,15 @@ export default {
       items: [],
       length: null,
       inputLength: null,
+      lengthI: null,
+      inputLengthI: null,
       sort: 'default',
       columns: ['#', 'Title', 'First Name', 'Last Name', 'Username', 'Photo']
     }
   },
   methods: {
-    // generates a number of users based on user input
-    generate: function() {
+    // generates a number of users based on user input using an external API (randomuser.me)
+    useExternal: function() {
       if (this.inputLength > 0 && this.inputLength <= 5000) {
         this.length = this.inputLength;
         axios.get('https://randomuser.me/api/?results=' + this.length).then(response => (
@@ -86,11 +91,14 @@ export default {
         alert("Please enter a number between 1 to 5000");
       }
     },
-    generateOwn: function() {
-        axios.get('http://127.0.0.1:8000/users').then(response => (
-          this.items = response.data.results.map(function (item, index) {
+    // generates a number of users based on user input using an internal API (must run separately)
+    useInternal: function() {
+      if (this.inputLengthI > 0 && this.inputLengthI <= 100) {
+        this.lengthI = this.inputLengthI;
+        axios.get('http://127.0.0.1:8000/api/results/' + this.lengthI).then(response => (
+          this.items = response.data.data.map(function (item) {
             let temp = {
-              id: index + 1,
+              id: item.id,
               title: item.title,
               firstName: item.firstName,
               lastName: item.lastName,
@@ -107,8 +115,11 @@ export default {
               alert(error);
             }
         })
+      } else {
+        alert("PLease enter a number between 1 to 100")
+      }
     },
-    // sorts the list of extracted users based on user selection
+    // sorts the list of extracted users based on what the user selected
     sortList: function(event) {
       this.items.sort(function(a, b) {
         a = JSON.stringify(a.userName);
@@ -122,7 +133,7 @@ export default {
       })
     },
     // Switches between internal API and external API (https://www.w3schools.com/howto/howto_js_tabs.asp)
-    switchTabs: function(evt, cityName) {
+    switchTabs: function(evt, tabName) {
       // Declare all variables
       var i, tabcontent, tablinks;
 
@@ -139,13 +150,13 @@ export default {
       }
 
       // Show the current tab, and add an "active" class to the button that opened the tab
-      document.getElementById(cityName).style.display = "block";
+      document.getElementById(tabName).style.display = "block";
       evt.currentTarget.className += " active";
     }
   }
 }
-
 </script>
+
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   h3 {
