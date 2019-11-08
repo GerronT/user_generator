@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="usergen">
     <div class="tab">
       <button class="tablinks" v-on:click="switchTabs($event, 'external-API')">randomuser.me</button>
       <button class="tablinks" v-on:click="switchTabs($event, 'internal-API')">use internal API</button>
