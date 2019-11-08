@@ -8,16 +8,14 @@
     <div id="external-API" class="tabcontent">
       <input id="inputNum" type="text" placeholder="Enter number of users (max: 5000)" v-model="inputLength">
       <input type="submit" value="Generate" v-on:click="useExternal">
-
-      <h1>Number of Generated Users: {{length}}</h1>
     </div>
 
     <div id="internal-API" class="tabcontent">
       <input id="inputNumI" type="text" placeholder="Enter number of users (max: 100)" v-model="inputLengthI">
       <input type="submit" value="Generate" v-on:click="useInternal">
-
-      <h1>Number of Generated Users: {{lengthI}}</h1>
     </div>
+
+    <h1>Number of Generated Users: {{length}}</h1>
 
     <p class='label'>Sort:</p>
     <select id="sort" name="sort" @change="sortList($event)" v-model="sort">
@@ -56,7 +54,6 @@ export default {
       items: [],
       length: null,
       inputLength: null,
-      lengthI: null,
       inputLengthI: null,
       sort: 'default',
       columns: ['#', 'Title', 'First Name', 'Last Name', 'Username', 'Photo']
@@ -94,8 +91,8 @@ export default {
     // generates a number of users based on user input using an internal API (must run separately)
     useInternal: function() {
       if (this.inputLengthI > 0 && this.inputLengthI <= 100) {
-        this.lengthI = this.inputLengthI;
-        axios.get('http://127.0.0.1:8000/api/results/' + this.lengthI).then(response => (
+        this.length = this.inputLengthI;
+        axios.get('http://127.0.0.1:8000/api/results/' + this.length).then(response => (
           this.items = response.data.data.map(function (item) {
             let temp = {
               id: item.id,
